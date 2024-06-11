@@ -4,8 +4,7 @@ from models.__init__ import CONN, CURSOR
 class Author:
     all = {}
 
-    def __init__(self, name, id=None):
-        self.id = id
+    def __init__(self, name):
         self.name = name
 
     def __repr__(self):
@@ -61,8 +60,9 @@ class Author:
     @classmethod
     def create(cls, name):
         author = cls(name)
-        author.save()
-        return author
+        # Save author to the database if needed
+        return author.name
+
 
     @classmethod
     def instance_from_db(cls, row):

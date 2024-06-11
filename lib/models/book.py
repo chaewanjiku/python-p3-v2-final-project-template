@@ -4,15 +4,16 @@ from models.__init__ import CONN, CURSOR
 class Book:
     all = {}
 
-    def __init__(self, title, genre, price, author_id, id=None):
+    def __init__(self, title, author, genre, year, price, id=None):
         self.id = id
         self.title = title
+        self.author = author
         self.genre = genre
+        self.year = year
         self.price = price
-        self.author_id = author_id
 
     def __repr__(self):
-        return f"<Book {self.id}: Title='{self.title}', Genre='{self.genre}', Price={self.price}, Author ID={self.author_id}>"
+        return f"<Book {self.id}: Title='{self.title}', Author='{self.author}', Genre='{self.genre}', Year={self.year}, Price={self.price}>"
 
     @property
     def title(self):
@@ -26,6 +27,17 @@ class Book:
             raise ValueError("Title must be a non-empty string")
 
     @property
+    def author(self):
+        return self._author
+
+    @author.setter
+    def author(self, author):
+        if isinstance(author, str) and len(author):
+            self._author = author
+        else:
+            raise ValueError("Author must be a non-empty string")
+
+    @property
     def genre(self):
         return self._genre
 
@@ -37,26 +49,26 @@ class Book:
             raise ValueError("Genre must be a non-empty string")
 
     @property
+    def year(self):
+        return self._year
+
+    @year.setter
+    def year(self, year):
+        if isinstance(year, int) and year > 0:
+            self._year = year
+        else:
+            raise ValueError("Year must be a positive integer")
+
+    @property
     def price(self):
         return self._price
 
     @price.setter
     def price(self, price):
-        if isinstance(price, (int, float)) and price >= 0:
+        if isinstance(price, float) and price >= 0:
             self._price = price
         else:
-            raise ValueError("Price must be a non-negative number")
-
-    @property
-    def author_id(self):
-        return self._author_id
-
-    @author_id.setter
-    def author_id(self, author_id):
-        if isinstance(author_id, int) and author_id > 0:
-            self._author_id = author_id
-        else:
-            raise ValueError("Author ID must be a positive integer")
+            raise ValueError("Price must be a non-negative float")
 
     @classmethod
     def create_table(cls):
@@ -64,10 +76,10 @@ class Book:
             CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY,
                 title TEXT,
+                author TEXT,
                 genre TEXT,
-                price REAL,
-                author_id INTEGER,
-                FOREIGN KEY (author_id) REFERENCES authors (id)
+                year INTEGER,
+                price REAL
             )
         """
         CURSOR.execute(sql)
@@ -80,15 +92,15 @@ class Book:
         CONN.commit()
 
     def save(self):
-        sql = "INSERT INTO books (title, genre, price, author_id) VALUES (?, ?, ?, ?)"
-        CURSOR.execute(sql, (self.title, self.genre, self.price, self.author_id))
+        sql = "INSERT INTO books (title, author, genre, year, price) VALUES (?, ?, ?, ?, ?)"
+        CURSOR.execute(sql, (self.title, self.author, self.genre, self.year, self.price))
         CONN.commit()
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
 
     def update(self):
-        sql = "UPDATE books SET title = ?, genre = ?, price = ?, author_id = ? WHERE id = ?"
-        CURSOR.execute(sql, (self.title, self.genre, self.price, self.author_id, self.id))
+        sql = "UPDATE books SET title = ?, author = ?, genre = ?, year = ?, price = ? WHERE id = ?"
+        CURSOR.execute(sql, (self.title, self.author, self.genre, self.year, self.price, self.id))
         CONN.commit()
 
     def delete(self):
@@ -99,8 +111,11 @@ class Book:
         self.id = None
 
     @classmethod
-    def create(cls, title, genre, price, author_id):
-        book = cls(title, genre, price, author_id)
+    def create(cls, title, author, genre, year, price):
+        if not isinstance(genre, str) or not len(genre):
+            raise ValueError("Genre must be a non-empty string")
+
+        book = cls(title, author, genre, year, price)
         book.save()
         return book
 
@@ -109,11 +124,12 @@ class Book:
         book = cls.all.get(row[0])
         if book:
             book.title = row[1]
-            book.genre = row[2]
-            book.price = row[3]
-            book.author_id = row[4]
+            book.author = row[2]
+            book.genre = row[3]
+            book.year = row[4]
+            book.price = row[5]
         else:
-            book = cls(row[1], row[2], row[3], row[4])
+            book = cls(row[1], row[2], row[3], row[4], row[5])
             book.id = row[0]
             cls.all[book.id] = book
         return book
@@ -126,12 +142,9 @@ class Book:
 
     @classmethod
     def find_by_genre(cls, genre):
+        if not isinstance(genre, str) or not len(genre):
+            raise ValueError("Genre must be a non-empty string")
+
         sql = "SELECT * FROM books WHERE genre = ?"
         rows = CURSOR.execute(sql, (genre,)).fetchall()
-        return [cls.instance_from_db(row) for row in rows]
-
-    @classmethod
-    def find_by_author(cls, author_id):
-        sql = "SELECT * FROM books WHERE author_id = ?"
-        rows = CURSOR.execute(sql, (author_id,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]
