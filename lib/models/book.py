@@ -3,6 +3,7 @@ from models.__init__ import CONN, CURSOR
 
 class Book:
     all = {}
+    allowed_genres = {"Fiction", "Non-Fiction", "Comics", "Fantasy", "Humor", "Romance"}
 
     def __init__(self, title, author, genre, year, price, id=None):
         self.id = id
@@ -43,10 +44,10 @@ class Book:
 
     @genre.setter
     def genre(self, genre):
-        if isinstance(genre, str) and len(genre):
+        if genre in self.allowed_genres:
             self._genre = genre
         else:
-            raise ValueError("Genre must be a non-empty string")
+            raise ValueError(f"Genre must be one of {', '.join(self.allowed_genres)}")
 
     @property
     def year(self):
@@ -112,9 +113,6 @@ class Book:
 
     @classmethod
     def create(cls, title, author, genre, year, price):
-        if not isinstance(genre, str) or not len(genre):
-            raise ValueError("Genre must be a non-empty string")
-
         book = cls(title, author, genre, year, price)
         book.save()
         return book
@@ -142,9 +140,8 @@ class Book:
 
     @classmethod
     def find_by_genre(cls, genre):
-        if not isinstance(genre, str) or not len(genre):
-            raise ValueError("Genre must be a non-empty string")
-
+        if genre not in cls.allowed_genres:
+            raise ValueError(f"Genre must be one of {', '.join(cls.allowed_genres)}")
         sql = "SELECT * FROM books WHERE genre = ?"
         rows = CURSOR.execute(sql, (genre,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]

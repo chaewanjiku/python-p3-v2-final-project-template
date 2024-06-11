@@ -1,4 +1,3 @@
-import sqlite3
 from models.__init__ import CONN, CURSOR
 
 class BorrowingHistory:
@@ -10,8 +9,8 @@ class BorrowingHistory:
         self.book_id = book_id
         self.borrowed_date = borrowed_date
         self.return_date = return_date
-
-    def __repr__(self):
+        
+    def _repr_(self):
         return f"<BorrowingHistory {self.id}: User ID={self.user_id}, Book ID={self.book_id}, Borrowed Date='{self.borrowed_date}', Return Date='{self.return_date}'>"
 
     @classmethod

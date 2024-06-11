@@ -4,11 +4,12 @@ from models.__init__ import CONN, CURSOR
 class Author:
     all = {}
 
-    def __init__(self, name):
+    def __init__(self, name, id=None):
+        self.id = id
         self.name = name
 
     def __repr__(self):
-        return f"<Author {self.id}: Name='{self.name}'>"
+        return f"<Author {self.id}: {self.name}>"
 
     @property
     def name(self):
@@ -45,11 +46,6 @@ class Author:
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
 
-    def update(self):
-        sql = "UPDATE authors SET name = ? WHERE id = ?"
-        CURSOR.execute(sql, (self.name, self.id))
-        CONN.commit()
-
     def delete(self):
         sql = "DELETE FROM authors WHERE id = ?"
         CURSOR.execute(sql, (self.id,))
@@ -60,9 +56,8 @@ class Author:
     @classmethod
     def create(cls, name):
         author = cls(name)
-        # Save author to the database if needed
-        return author.name
-
+        author.save()
+        return author
 
     @classmethod
     def instance_from_db(cls, row):
@@ -79,10 +74,4 @@ class Author:
     def get_all(cls):
         sql = "SELECT * FROM authors"
         rows = CURSOR.execute(sql).fetchall()
-        return [cls.instance_from_db(row) for row in rows]
-
-    @classmethod
-    def find_by_name(cls, name):
-        sql = "SELECT * FROM authors WHERE name = ?"
-        rows = CURSOR.execute(sql, (name,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]

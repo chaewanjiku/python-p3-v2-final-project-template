@@ -9,7 +9,7 @@ class Category:
         self.name = name
 
     def __repr__(self):
-        return f"<Category {self.id}: Name='{self.name}'>"
+        return f"<Category {self.id}: {self.name}>"
 
     @property
     def name(self):
@@ -46,11 +46,6 @@ class Category:
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
 
-    def update(self):
-        sql = "UPDATE categories SET name = ? WHERE id = ?"
-        CURSOR.execute(sql, (self.name, self.id))
-        CONN.commit()
-
     def delete(self):
         sql = "DELETE FROM categories WHERE id = ?"
         CURSOR.execute(sql, (self.id,))
@@ -79,10 +74,4 @@ class Category:
     def get_all(cls):
         sql = "SELECT * FROM categories"
         rows = CURSOR.execute(sql).fetchall()
-        return [cls.instance_from_db(row) for row in rows]
-
-    @classmethod
-    def find_by_name(cls, name):
-        sql = "SELECT * FROM categories WHERE name = ?"
-        rows = CURSOR.execute(sql, (name,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]

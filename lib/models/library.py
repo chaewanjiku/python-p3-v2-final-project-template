@@ -1,4 +1,3 @@
-import sqlite3
 from models.__init__ import CONN, CURSOR
 
 class Library:
@@ -9,7 +8,7 @@ class Library:
         self.name = name
         self.location = location
 
-    def __repr__(self):
+    def _repr_(self):
         return f"<Library {self.id}: Name='{self.name}', Location='{self.location}'>"
 
     @property
@@ -72,7 +71,7 @@ class Library:
         self.id = None
 
     @classmethod
-    def create(cls, name, location):
+    def create(cls, name, location, *, librarian_name=None):
         library = cls(name, location)
         library.save()
         return library

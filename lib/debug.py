@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # lib/debug.py
 
-from models.__init__ import CONN, CURSOR
 from datetime import datetime
 from models.book import Book
 from models.author import Author
@@ -11,65 +10,52 @@ from models.category import Category
 from models.user import User
 import ipdb
 
-
 def reset_database():
     Book.drop_table()
     Book.create_table()
 
-    # Create seed data for books
-    fitzgerald_name = Author.create("F. Scott Fitzgerald")
-    lee_name = Author.create("Harper Lee")
-    orwell_name = Author.create("George Orwell")
-    austen_name = Author.create("Jane Austen")
-    
-    # Ensure that the genre parameter is a non-empty string
-    fiction = Category.create("Fiction")
-    if not fiction:
-        raise ValueError("Failed to create 'Fiction' category")
+    Author.drop_table()
+    Author.create_table()
 
-    non_fiction = Category.create("Non-Fiction")
-    if not non_fiction:
-        raise ValueError("Failed to create 'Non-Fiction' category")
-
-    # Make sure genre values are non-empty strings
-    Book.create("The Great Gatsby", fitzgerald_name, fiction, 1925, 19.25)
-    Book.create("To Kill a Mockingbird", lee_name, fiction, 1960, 19.60)
-    Book.create("1984", orwell_name, fiction, 1949, 19.49)
-    Book.create("Pride and Prejudice", austen_name, fiction, 1813, 18.13)
-
-    # Add more book entries as needed...
-
-    # Add more book entries as needed...
-
-
-    # Add more book entries as needed...
-
-    # Add more author entries as needed...
-
-    # Add more category entries as needed...
+    Category.drop_table()
+    Category.create_table()
 
     User.drop_table()
     User.create_table()
+
+    BorrowingHistory.drop_table()
+    BorrowingHistory.create_table()
+
+    Library.drop_table()
+    Library.create_table()
+
+    # Create seed data for authors
+    fitzgerald = Author.create("F. Scott Fitzgerald")
+    lee = Author.create("Harper Lee")
+    orwell = Author.create("George Orwell")
+    austen = Author.create("Jane Austen")
+
+    # Create seed data for categories
+    fiction = Category.create("Fiction")
+    comics = Category.create("Comics")
+    fantasy = Category.create("Fantasy")
+    humor = Category.create("Humor")
+    romance = Category.create("Romance")
+
+    # Create seed data for books
+    Book.create("The Great Gatsby", "F. Scott Fitzgerald", "Fiction", 1925, 19.25)
+
 
     # Create seed data for users
     User.create("Alice", "alice@example.com", "password123")
     User.create("Bob", "bob@example.com", "password123")
     User.create("Charlie", "charlie@example.com", "password123")
-    # Add more user entries as needed...
-
-    BorrowingHistory.drop_table()
-    BorrowingHistory.create_table()
 
     # Create seed data for borrowing history
-    BorrowingHistory.create(user_id=1, book_id=1, borrowed_date=datetime.now(), returned_date=None)
-    # Add more borrowing history entries as needed...
-
-    Library.drop_table()
-    Library.create_table()
+    BorrowingHistory.create(1, 1, datetime.now(), None)
 
     # Create seed data for library
-    Library.create("Main Library", "123 Library St", "Librarian Name")
-    # Add more library entries as needed...
+    Library.create("Main Library", "123 Library St", librarian_name="Librarian Name")
 
 reset_database()
 ipdb.set_trace()
