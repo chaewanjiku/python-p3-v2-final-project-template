@@ -75,3 +75,20 @@ class Author:
         sql = "SELECT * FROM authors"
         rows = CURSOR.execute(sql).fetchall()
         return [cls.instance_from_db(row) for row in rows]
+    
+    @classmethod
+    def find_by_name(cls, name):
+        """Return a list of authors corresponding to all table rows matching the specified name"""
+        sql = """
+            SELECT *
+            FROM authors
+            WHERE name = ?
+        """
+        rows = CURSOR.execute(sql, (name,)).fetchall()
+        return [cls.instance_from_db(row) for row in rows]
+
+    @classmethod
+    def find_by_id(cls, id_):
+        CURSOR.execute('SELECT * FROM authors WHERE id = ?', (id_,))
+        row = CURSOR.fetchone()
+        return cls.instance_from_db(row) if row else None

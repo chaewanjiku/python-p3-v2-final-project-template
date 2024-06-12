@@ -30,10 +30,18 @@ def reset_database():
     Library.create_table()
 
     # Create seed data for authors
-    fitzgerald = Author.create("F. Scott Fitzgerald")
-    lee = Author.create("Harper Lee")
-    orwell = Author.create("George Orwell")
-    austen = Author.create("Jane Austen")
+    Author.create("F. Scott Fitzgerald")
+    Author.create("Harper Lee")
+    Author.create("Allan Moore")
+    Author.create("Neil Gaiman")
+    Author.create("J.R.R Tolkien")
+    Author.create("J.K Rowling")
+    Author.create("Douglas Adams")
+    Author.create("Neil Teddy")
+    Author.create("Jane Austen")
+    Author.create("Diana Gabaldon")
+
+
 
     # Create seed data for categories
     fiction = Category.create("Fiction")
@@ -44,18 +52,39 @@ def reset_database():
 
     # Create seed data for books
     Book.create("The Great Gatsby", "F. Scott Fitzgerald", "Fiction", 1925, 19.25)
+    Book.create("To Kill a Mockingbird", "Harper Lee", "Fiction", 1960, 14.99)
+    Book.create("Watchmen", "Alan Moore", "Comics", 1986, 29.99)
+    Book.create("The Sandman: Preludes & Nocturnes", "Neil Gaiman", "Comics", 1989, 24.99)
+    Book.create("The Hobbit", "J.R.R. Tolkien", "Fantasy", 1937, 15.99)
+    Book.create("Harry Potter and the Philosopher's Stone", "J.K. Rowling", "Fantasy", 1997, 20.99)
+    Book.create("The Hitchhiker's Guide to the Galaxy", "Douglas Adams", "Humor", 1979, 12.99)
+    Book.create("Good Omens", "Neil Teddy", "Humor", 1990, 14.99)
+    Book.create("Pride and Prejudice", "Jane Austen", "Romance", 1813, 9.99)
+    Book.create("Outlander", "Diana Gabaldon", "Romance", 1991, 16.99)
 
-
+    
     # Create seed data for users
     User.create("Alice", "alice@example.com", "password123")
     User.create("Bob", "bob@example.com", "password123")
     User.create("Charlie", "charlie@example.com", "password123")
+    User.create("David", "david@example.com", "password123")
+    User.create("Eve", "eve@example.com", "password123")
+    User.create("Frank", "frank@example.com", "password123")
+    User.create("Grace", "grace@example.com", "password123")
+    User.create("Hannah", "hannah@example.com", "password123")
+
 
     # Create seed data for borrowing history
     BorrowingHistory.create(1, 1, datetime.now(), None)
 
     # Create seed data for library
-    Library.create("Main Library", "123 Library St", librarian_name="Librarian Name")
+    Library.create("Main Library", "123 Library St")
+    Library.create("Central Library", "456 Central Ave")
+    Library.create("Westside Branch", "789 Westside Blvd")
+    Library.create("Eastside Branch", "101 Eastside Rd")
+    Library.create("North Branch", "202 North St")
+    Library.create("South Branch", "303 South Ave")
+
 
 reset_database()
 ipdb.set_trace()

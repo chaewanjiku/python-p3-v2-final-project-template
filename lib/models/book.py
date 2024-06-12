@@ -145,3 +145,14 @@ class Book:
         sql = "SELECT * FROM books WHERE genre = ?"
         rows = CURSOR.execute(sql, (genre,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]
+    
+    @classmethod
+    def find_by_author(cls, author):
+        """Return a list of authors corresponding to all table rows matching the specified name"""
+        sql = """
+            SELECT *
+            FROM books
+            WHERE author = ?
+        """
+        rows = CURSOR.execute(sql, (author,)).fetchall()
+        return [cls.instance_from_db(row) for row in rows]
