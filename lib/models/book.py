@@ -156,3 +156,17 @@ class Book:
         """
         rows = CURSOR.execute(sql, (author,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]
+    
+    @classmethod
+    def find_by_id(cls, id_):
+        CURSOR.execute('SELECT * FROM books WHERE id = ?', (id_,))
+        row = CURSOR.fetchone()
+        return cls.instance_from_db(row) if row else None
+    
+    def borrowing_history(self):
+        from models.borrowinghistory import BorrowingHistory
+        sql ="""
+      SELECT * FROM borrowing_history WHERE book_id =?"""
+        CURSOR.execute(sql,(self.id,),)
+        rows =CURSOR.fetchall()
+        return[ BorrowingHistory.instance_from_db(row)for row in rows]

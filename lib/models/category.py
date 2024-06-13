@@ -45,6 +45,10 @@ class Category:
         CONN.commit()
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
+    def update(self):
+        sql = "UPDATE categories SET name = ?  WHERE id = ?"
+        CURSOR.execute(sql, (self.name, self.id))
+        CONN.commit()     
 
     def delete(self):
         sql = "DELETE FROM categories WHERE id = ?"
@@ -74,4 +78,21 @@ class Category:
     def get_all(cls):
         sql = "SELECT * FROM categories"
         rows = CURSOR.execute(sql).fetchall()
+        return [cls.instance_from_db(row) for row in rows]
+    
+    @classmethod
+    def find_by_id(cls, id_):
+        CURSOR.execute('SELECT * FROM categories WHERE id = ?', (id_,))
+        row = CURSOR.fetchone()
+        return cls.instance_from_db(row) if row else None
+    
+    @classmethod
+    def find_by_name(cls, name):
+        """Return a list of names corresponding to all table rows matching the specified name"""
+        sql = """
+            SELECT *
+            FROM categories
+            WHERE name = ?
+        """
+        rows = CURSOR.execute(sql, (name,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]

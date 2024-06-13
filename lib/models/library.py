@@ -8,9 +8,11 @@ class Library:
         self.name = name
         self.location = location
 
-    def _repr_(self):
-        return f"<Library {self.id}: Name='{self.name}', Location='{self.location}'>"
-
+    def __str__(self):
+        return f"Library Name: {self.name}, Location: {self.location}"
+    def __repr__(self):
+        return f'Library(name={self.name}, location={self.location})'
+    
     @property
     def name(self):
         return self._name
@@ -71,7 +73,7 @@ class Library:
         self.id = None
 
     @classmethod
-    def create(cls, name, location, *, librarian_name=None):
+    def create(cls, name, location):
         library = cls(name, location)
         library.save()
         return library
@@ -104,3 +106,8 @@ class Library:
         sql = "SELECT * FROM libraries WHERE location = ?"
         rows = CURSOR.execute(sql, (location,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]
+    @classmethod
+    def find_by_id(cls, id_):
+        CURSOR.execute('SELECT * FROM libraries WHERE id = ?', (id_,))
+        row = CURSOR.fetchone()
+        return cls.instance_from_db(row) if row else None

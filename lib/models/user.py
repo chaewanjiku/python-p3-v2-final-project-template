@@ -119,3 +119,16 @@ class User:
         sql = "SELECT * FROM users WHERE email = ?"
         rows = CURSOR.execute(sql, (email,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]
+    @classmethod
+    def find_by_id(cls, id_):
+        CURSOR.execute('SELECT * FROM users WHERE id = ?', (id_,))
+        row = CURSOR.fetchone()
+        return cls.instance_from_db(row) if row else None
+
+    def borrowing_history(self):
+        from models.borrowinghistory import BorrowingHistory
+        sql ="""
+      SELECT * FROM borrowing_history WHERE user_id =?"""
+        CURSOR.execute(sql,(self.id,),)
+        rows =CURSOR.fetchall()
+        return[ BorrowingHistory.instance_from_db(row)for row in rows]
