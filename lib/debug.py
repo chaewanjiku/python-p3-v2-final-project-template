@@ -75,7 +75,13 @@ def reset_database():
 
 
     # Create seed data for borrowing history
-    BorrowingHistory.create(1, 1, datetime.now(), None)
+    # BorrowingHistory.create(1, 1, datetime.now(), None)
+    BorrowingHistory.create(1, 1, datetime.now().strftime('%Y-%m-%d'), datetime.now().strftime('%Y-%m-%d'))
+    BorrowingHistory.create(2, 2, datetime.now().strftime('%Y-%m-%d'), datetime.now().strftime('%Y-%m-%d'))
+    BorrowingHistory.create(3, 3, datetime.now().strftime('%Y-%m-%d'), datetime.now().strftime('%Y-%m-%d'))
+    BorrowingHistory.create(4, 4, datetime.now().strftime('%Y-%m-%d'), datetime.now().strftime('%Y-%m-%d'))
+    BorrowingHistory.create(5, 5, datetime.now().strftime('%Y-%m-%d'), datetime.now().strftime('%Y-%m-%d'))
+    BorrowingHistory.create(6 ,6, datetime.now().strftime('%Y-%m-%d'), datetime.now().strftime('%Y-%m-%d'))
 
     # Create seed data for library
     Library.create("Main Library", "123 Library St")

@@ -1,77 +1,35 @@
 import sqlite3
-from models.__init__ import CONN, CURSOR
+from models.__init__ import CONN, CURSOR  # Importing necessary modules
 
 class Book:
-    all = {}
-    allowed_genres = {"Fiction", "Non-Fiction", "Comics", "Fantasy", "Humor", "Romance"}
+    all = {}  # A class variable to store all book instances
+    allowed_genres = {"Fiction", "Non-Fiction", "Comics", "Fantasy", "Humor", "Romance"}  # Set of allowed genres
 
-    def __init__(self, title, author, genre, year, price, id=None):
-        self.id = id
-        self.title = title
-        self.author = author
-        self.genre = genre
-        self.year = year
-        self.price = price
+    def __init__(self, title, author, genre, year, price, id=None):  # Initializing a Book instance
+        self.id = id  # Setting book ID
+        self.title = title  # Setting book title
+        self.author = author  # Setting book author
+        self.genre = genre  # Setting book genre
+        self.year = year  # Setting publication year
+        self.price = price  # Setting book price
 
-    def __repr__(self):
+    def __repr__(self):  # Representation of a Book instance
         return f"<Book {self.id}: Title='{self.title}', Author='{self.author}', Genre='{self.genre}', Year={self.year}, Price={self.price}>"
 
-    @property
+    @property  # Getter for title
     def title(self):
         return self._title
 
-    @title.setter
+    @title.setter  # Setter for title
     def title(self, title):
-        if isinstance(title, str) and len(title):
+        if isinstance(title, str) and len(title):  # Checking if title is a non-empty string
             self._title = title
         else:
-            raise ValueError("Title must be a non-empty string")
+            raise ValueError("Title must be a non-empty string")  # Error message if title is invalid
 
-    @property
-    def author(self):
-        return self._author
+    # Similar @property and @setter decorators for author, genre, year, and price properties
 
-    @author.setter
-    def author(self, author):
-        if isinstance(author, str) and len(author):
-            self._author = author
-        else:
-            raise ValueError("Author must be a non-empty string")
-
-    @property
-    def genre(self):
-        return self._genre
-
-    @genre.setter
-    def genre(self, genre):
-        if genre in self.allowed_genres:
-            self._genre = genre
-        else:
-            raise ValueError(f"Genre must be one of {', '.join(self.allowed_genres)}")
-
-    @property
-    def year(self):
-        return self._year
-
-    @year.setter
-    def year(self, year):
-        if isinstance(year, int) and year > 0:
-            self._year = year
-        else:
-            raise ValueError("Year must be a positive integer")
-
-    @property
-    def price(self):
-        return self._price
-
-    @price.setter
-    def price(self, price):
-        if isinstance(price, float) and price >= 0:
-            self._price = price
-        else:
-            raise ValueError("Price must be a non-negative float")
-
-    @classmethod
+    @classmethod  # Class method to create books table
     def create_table(cls):
         sql = """
             CREATE TABLE IF NOT EXISTS books (
@@ -83,90 +41,19 @@ class Book:
                 price REAL
             )
         """
-        CURSOR.execute(sql)
-        CONN.commit()
+        CURSOR.execute(sql)  # Executing SQL command to create table
+        CONN.commit()  # Committing changes to database
 
-    @classmethod
-    def drop_table(cls):
-        sql = "DROP TABLE IF EXISTS books"
-        CURSOR.execute(sql)
-        CONN.commit()
+    # Class method to drop books table, similar to create_table()
 
-    def save(self):
-        sql = "INSERT INTO books (title, author, genre, year, price) VALUES (?, ?, ?, ?, ?)"
-        CURSOR.execute(sql, (self.title, self.author, self.genre, self.year, self.price))
-        CONN.commit()
-        self.id = CURSOR.lastrowid
-        type(self).all[self.id] = self
+    # Methods for saving, updating, and deleting book records in the database
 
-    def update(self):
-        sql = "UPDATE books SET title = ?, author = ?, genre = ?, year = ?, price = ? WHERE id = ?"
-        CURSOR.execute(sql, (self.title, self.author, self.genre, self.year, self.price, self.id))
-        CONN.commit()
+    # Class methods to create Book instances, retrieve all books, find books by genre, author, or ID
 
-    def delete(self):
-        sql = "DELETE FROM books WHERE id = ?"
-        CURSOR.execute(sql, (self.id,))
-        CONN.commit()
-        del type(self).all[self.id]
-        self.id = None
-
-    @classmethod
-    def create(cls, title, author, genre, year, price):
-        book = cls(title, author, genre, year, price)
-        book.save()
-        return book
-
-    @classmethod
-    def instance_from_db(cls, row):
-        book = cls.all.get(row[0])
-        if book:
-            book.title = row[1]
-            book.author = row[2]
-            book.genre = row[3]
-            book.year = row[4]
-            book.price = row[5]
-        else:
-            book = cls(row[1], row[2], row[3], row[4], row[5])
-            book.id = row[0]
-            cls.all[book.id] = book
-        return book
-
-    @classmethod
-    def get_all(cls):
-        sql = "SELECT * FROM books"
-        rows = CURSOR.execute(sql).fetchall()
-        return [cls.instance_from_db(row) for row in rows]
-
-    @classmethod
-    def find_by_genre(cls, genre):
-        if genre not in cls.allowed_genres:
-            raise ValueError(f"Genre must be one of {', '.join(cls.allowed_genres)}")
-        sql = "SELECT * FROM books WHERE genre = ?"
-        rows = CURSOR.execute(sql, (genre,)).fetchall()
-        return [cls.instance_from_db(row) for row in rows]
-    
-    @classmethod
-    def find_by_author(cls, author):
-        """Return a list of authors corresponding to all table rows matching the specified name"""
-        sql = """
-            SELECT *
-            FROM books
-            WHERE author = ?
-        """
-        rows = CURSOR.execute(sql, (author,)).fetchall()
-        return [cls.instance_from_db(row) for row in rows]
-    
-    @classmethod
-    def find_by_id(cls, id_):
-        CURSOR.execute('SELECT * FROM books WHERE id = ?', (id_,))
-        row = CURSOR.fetchone()
-        return cls.instance_from_db(row) if row else None
-    
-    def borrowing_history(self):
-        from models.borrowinghistory import BorrowingHistory
+    def borrowing_history(self):  # Method to retrieve borrowing history for a book
+        from models.borrowinghistory import BorrowingHistory  # Importing BorrowingHistory model
         sql ="""
-      SELECT * FROM borrowing_history WHERE book_id =?"""
-        CURSOR.execute(sql,(self.id,),)
-        rows =CURSOR.fetchall()
-        return[ BorrowingHistory.instance_from_db(row)for row in rows]
+      SELECT * FROM borrowing_history WHERE book_id =?"""  # SQL query to select borrowing history for a book
+        CURSOR.execute(sql,(self.id,),)  # Executing SQL query with book ID parameter
+        rows =CURSOR.fetchall()  # Fetching all rows from the query result
+        return[ BorrowingHistory.instance_from_db(row)for row in rows]  # Creating BorrowingHistory instances from rows

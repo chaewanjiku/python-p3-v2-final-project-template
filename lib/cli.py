@@ -75,7 +75,7 @@ def author_menu():
         print("1. Display all authors")
         print("2. Display author by name")
         print("3. Create author")
-        print("4.Update  author")
+        print("4. Update  author")
         print("5. Delete author")
         print("6. Return to main menu")
         
@@ -157,7 +157,7 @@ def library_record():
         print("1. Display all libraries")
         print("2. Display library by name")
         print("3. Create library")
-        print("4. Upadate library")
+        print("4. Update library")
         print("5. Delete library")
         print("6. Return to main menu")
         
